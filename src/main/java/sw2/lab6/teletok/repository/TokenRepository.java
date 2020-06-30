@@ -5,9 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sw2.lab6.teletok.entity.Token;
 
+import java.util.List;
+
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Integer> {
+    
+    Token findByCode(String code);
 
-    @Query(value = "SELECT * FROM token where user_id =?1",nativeQuery = true)
-    Token buscarTokenPorUserid(int id);
+    @Query(value = "select * from teletok.token where token.code=?1", nativeQuery = true)
+    Token darToken(String cod);
+
 }
