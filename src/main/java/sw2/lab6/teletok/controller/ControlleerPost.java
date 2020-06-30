@@ -4,14 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
+import sw2.lab6.teletok.Dtos.Coment;
+import sw2.lab6.teletok.entity.Post;
 import sw2.lab6.teletok.entity.PostComment;
 import sw2.lab6.teletok.entity.Token;
 import sw2.lab6.teletok.repository.PostCommentRepository;
+import sw2.lab6.teletok.repository.PostRepository;
 import sw2.lab6.teletok.repository.TokenRepository;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -23,29 +24,36 @@ public class ControlleerPost {
     @Autowired
     TokenRepository tokenRepository;
 
+    @Autowired
+    PostRepository postRepository;
+
     @PostMapping(value = "/save", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity guardarComentario(@RequestParam("postid")int postId , @RequestParam("token") String token,
-                                            @RequestParam("mesaage")String message,@RequestParam(value = "fetchId", required = false) boolean fetchId) {
+    public ResponseEntity guardarComentario(@RequestBody Coment coment) {
         HashMap<String, Object> responseMap = new HashMap<>();
         PostComment postComment = new PostComment();
-        Token auxtoken= tokenRepository.darToken(token);
-        if(auxtoken!=null){
-            if(postId>0 && message!=null){
-                postComment.getPost().setId(postId);
-                postComment.setMessage(message);
+        Post post =new Post();
+        Optional<Post> paux= postRepository.findById(coment.getPostId());
+        Token auxtoken= tokenRepository.darToken(coment.getToken());
+        if(auxtoken!=null && paux!=null ){
+            if(coment.getPostId()>0 && coment.getMessage()!=null){
+                post.setId(coment.getPostId());
+                postComment.setPost(post);
+                postComment.setMessage(coment.getMessage());
                 postComment.getUser().setId(auxtoken.getUser().getId());
                 postCommentRepository.save(postComment);
                 responseMap.put("id",postComment.getId());
                 return new ResponseEntity(responseMap, HttpStatus.CREATED);
             }
         }
+        else if (paux==null){
+            responseMap.put("error", "POST_NOT_FOUND");
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+        }
         else{
             responseMap.put("error", "TOKEN_INVALID");
-            return new ResponseEntity(responseMap, HttpStatus.CREATED);
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
         }
-        responseMap.put("error", "POST_NOT_FOUND");
         return new ResponseEntity(responseMap, HttpStatus.CREATED);
-
     }
 
     /*@ExceptionHandler(HttpMessageNotReadableException.class)
@@ -58,4 +66,7 @@ public class ControlleerPost {
         }
         return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
     }*/
+
+
+
 }
