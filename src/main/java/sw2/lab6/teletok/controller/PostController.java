@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sw2.lab6.teletok.Dtos.PostUp;
 import sw2.lab6.teletok.entity.Post;
 import sw2.lab6.teletok.entity.Token;
 import sw2.lab6.teletok.entity.User;
@@ -37,18 +38,18 @@ public class PostController {
     }
 
     @PostMapping(value = "/post/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity savePost(@RequestParam(value = "token", required = true) String token, @RequestParam(value = "description", required = true) String description, @RequestParam(value = "media", required = true)File foto) {
+    public ResponseEntity savePost(PostUp postUp) {
         HashMap<String, Object> responseMap = new HashMap<>();
-        Token token1 =tokenRepository.findByCode(token);
+        Token token1 =tokenRepository.findByCode(postUp.getToken());
 
         if (token1!=null){
-            if(foto!=null){
+            if(postUp.getFoto()!=null){
                 User user = token1.getUser();
                 Post post = new Post();
-                post.setDescription(description);
+                post.setDescription(postUp.getDescription());
                 Date date = new Date();
                 post.setCreationDate(date);
-                post.setMediaUrl(foto.getName());
+                post.setMediaUrl(postUp.getFoto().getName());
                 post.setUser(user);
                 postRepository.save(post);
                 responseMap.put("postId", postRepository.save(post).getId());
