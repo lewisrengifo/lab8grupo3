@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
-    @Query(value="SELECT * FROM post where description = ?1 or user_id=(select id from user where username = ?1)",nativeQuery=true)
+    @Query(value="SELECT * FROM post where description like %?1% or user_id=(select id from user where username like %?1%)",nativeQuery=true)
     ArrayList<Post> listaDePost(String buscar);
 }
