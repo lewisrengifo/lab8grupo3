@@ -15,4 +15,7 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
     @Query(value = "select * from teletok.token where token.code=?1", nativeQuery = true)
     Token darToken(String cod);
 
+    @Query(value = "SELECT * FROM token where user_id =?1", nativeQuery = true)
+    Token buscarTokenPorUserid(int cod);
+
 }
