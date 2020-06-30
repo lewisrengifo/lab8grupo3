@@ -6,4 +6,5 @@ import sw2.lab6.teletok.entity.Token;
 
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Integer> {
+    Token findByCode(String code);
 }
