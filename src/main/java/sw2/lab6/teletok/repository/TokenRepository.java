@@ -9,6 +9,10 @@ import java.util.List;
 
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Integer> {
+    
+    Token findByCode(String code);
+
     @Query(value = "select * from teletok.token where token.code=?1", nativeQuery = true)
     Token darToken(String cod);
+
 }
